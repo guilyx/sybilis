@@ -1,5 +1,9 @@
 import json
-from typing import List
+from typing import List, Dict
+from web3 import Web3
+import requests
+from requests.adapters import Retry
+
 
 class Network:
     def __init__(
@@ -24,7 +28,7 @@ class Network:
         return f"{self.name}"
 
 
-def load_networks(filepath: str) -> List[Network]:
+def load_networks(filepath: str) -> Dict[str, Network]:
     with open(filepath, "r") as f:
         networks_json = json.load(f)
     networks = {}
