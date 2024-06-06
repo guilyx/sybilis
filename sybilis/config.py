@@ -16,6 +16,7 @@ NETWORKS = load_networks(os.getenv("NETWORKS"))
 
 # RETRY MODE
 RETRY_COUNT = 3
+RETRY = 3
 
 MAX_GWEI = 40
 CHECK_GWEI = True

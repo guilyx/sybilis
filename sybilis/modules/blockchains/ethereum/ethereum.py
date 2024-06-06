@@ -2,6 +2,7 @@ from modules.interfaces.evm import EVMInterface
 from modules.interfaces.account import Account
 from modules.tools import retry, check_gas
 from modules.logger.logger import logger
+from modules.exceptions import BlockchainException
 
 from config import NETWORKS
 from config import EthereumSettings
@@ -43,22 +44,34 @@ class Ethereum(EVMInterface):
             self.config.BRIDGE_CONTRACTS["oracle"], self.config.ORACLE_ABI
         )
 
-        fee = await contract_oracle.functions.estimateCrossDomainMessageFee(
-            168000
-        ).call()
+        fee = int(
+            await contract_oracle.functions.estimateCrossDomainMessageFee(168000).call()
+            * 1.2
+        )
 
-        logger.info(f"[{self.address}] Bridge to Scroll | Expected {self.web3.from_wei(fee, 'ether')} ETH fee...")
+        total_tx_wei = fee + amount_wei
+        total_tx_eth = self.web3.from_wei(total_tx_wei * 1.2, "ether")
 
-        tx_data = await self.get_tx_data(amount_wei + fee, False)
+        logger.info(
+            f"[{self.address}] Bridge to Scroll | Amount + Fees is {total_tx_eth} ETH"
+        )
+
+        logger.info(
+            f"[{self.address}] Bridge to Scroll | Expected {self.web3.from_wei(fee, 'ether')} ETH fee..."
+        )
+
+        tx_data = await self.get_tx_data(total_tx_wei, False)
 
         logger.info(f"[{self.address}] Bridge to Scroll | TX Data: {tx_data}")
 
         transaction = await contract.functions.depositETH(
-            amount_wei,
+            total_tx_wei,
             168000,
         ).build_transaction(tx_data)
 
         logger.info(f"[{self.address}] Bridge to Scroll | TX Built: {transaction}")
+
+        raise Exception("Stoccazo")
 
         signed_txn = await self.sign(transaction)
 

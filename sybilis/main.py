@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import os
 import sys
 
-load_dotenv("/home/erwinl/github/web3/sybilis/.env")
+load_dotenv("/home/wardn/github/sybilis/.env")
 
 import questionary
 from questionary import Choice
@@ -31,7 +31,7 @@ def get_module():
             Choice("2) Withdraw from Scroll", withdraw_scroll),
             Choice("3) Swap on SyncSwap", swap_syncswap),
             # Choice("4) Make transfer", make_transfer),
-            Choice("4) Check transaction count", "tx_checker"),
+            Choice("4) Check transaction count", "get_tx_count"),
             Choice("5) Check balance (ethereum)", "get_ethereum_balance"),
             Choice("6) Check balance (scroll)", "get_scroll_balance"),
             Choice("7) Exit", "exit"),
@@ -63,9 +63,13 @@ def _async_run_module(module, account):
 
 def main(module):
     with ThreadPoolExecutor(max_workers=N_THREADS) as executor:
-        for acc in ACCOUNTS:
-            executor.submit(_async_run_module, module, acc)
-            time.sleep(random.randint(THREAD_SLEEP_FROM, THREAD_SLEEP_TO))
+        if module == "get_ethereum_balance":
+            get_ethereum_balance(ACCOUNTS)
+
+        else:
+            for acc in ACCOUNTS:
+                executor.submit(_async_run_module, module, acc)
+                time.sleep(random.randint(THREAD_SLEEP_FROM, THREAD_SLEEP_TO))
 
 
 if __name__ == "__main__":

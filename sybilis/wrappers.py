@@ -16,8 +16,8 @@ async def deposit_scroll(account: Account):
     all_amount - bridge from min_percent to max_percent
     """
 
-    min_amount = 0.0036
-    max_amount = 0.004
+    min_amount = 0.002
+    max_amount = 0.005
     decimal = 4
 
     all_amount = False
@@ -25,8 +25,8 @@ async def deposit_scroll(account: Account):
     min_percent = 100
     max_percent = 100
 
-    eth = Ethereum(account)
-    await eth.deposit_scroll(
+    scroll = Scroll(account)
+    await scroll.deposit_scroll(
         min_amount, max_amount, decimal, all_amount, min_percent, max_percent
     )
 
